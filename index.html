@@ -165,34 +165,45 @@
             margin: 0 auto 14px auto;
         }
 
-        .search-bar input {
-            display: block;
-            width: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 10px 0;
-            color: #222;
-            font-size: 16px;
-            font-family: inherit;
-            text-align: center;
-        }
+.search-bar input {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 10px 40px;
+    color: #222;
+    font-size: 16px;
+    font-family: inherit;
+    text-align: center;
+}
 
         .search-bar input::placeholder { color: #999; }
 
         .search-icon {
             position: absolute;
-            right: 12px;
+            right: 4px;
             top: 50%;
             transform: translateY(-50%);
-            pointer-events: none;
             display: flex;
             align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .search-icon:hover {
+            background: rgba(0,0,0,0.06);
         }
 
         .search-icon svg {
             width: clamp(14px, 1.5vw, 18px);
             height: clamp(14px, 1.5vw, 18px);
+            display: block;
         }
 
         .quote p {
@@ -317,7 +328,6 @@
             display: block;
         }
 
-        /* Rólunk overlay: nincs backdrop blur, csak a modal card jelenik meg */
         .modal-overlay {
             position: absolute;
             inset: 6px;
@@ -375,7 +385,6 @@
             color: #000;
         }
 
-        /* Menü modal */
         .menu-header {
             position: relative;
             padding: 60px 24px 0 24px;
@@ -428,7 +437,6 @@
             color: #999;
         }
 
-        /* Rólunk modal - alul 30px üres sáv */
         .about-modal {
             padding-bottom: 30px;
         }
@@ -532,13 +540,13 @@
         <div class="hero-content">
             <p class="tagline">Inspirálódj a világból,<br>és találj rá a lehetőségeidre</p>
             <div class="search-bar">
-                <input type="text" placeholder="Keresés...">
-                <div class="search-icon">
+                <input type="text" id="searchInput" placeholder="Keresés...">
+                <button class="search-icon" onclick="doSearch()" aria-label="Keresés">
                     <svg viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="10.5" cy="10.5" r="6.5"/>
                         <line x1="15.5" y1="15.5" x2="21" y2="21"/>
                     </svg>
-                </div>
+                </button>
             </div>
             <div class="quote">
                 <p>„A nők nemcsak családokat, hanem<br>közösségeket és nemzeteket is építenek."</p>
@@ -552,7 +560,7 @@
             <button class="filter-btn">Szakemberek</button>
         </div>
 
-        <!-- Menü modal (backdrop-pal) -->
+        <!-- Menü modal -->
         <div class="modal-backdrop" id="menuModal">
             <div class="modal">
                 <button class="modal-close" onclick="closeMenu()">✕</button>
@@ -571,7 +579,7 @@
             </div>
         </div>
 
-        <!-- Rólunk modal (nincs saját backdrop, a menü blurjét használja) -->
+        <!-- Rólunk modal -->
         <div class="modal-overlay" id="aboutModal">
             <div class="modal about-modal">
                 <button class="modal-close" onclick="closeAbout()">✕</button>
@@ -592,7 +600,6 @@
                             <p>A nails1.hu célja egyszerű, mégis erőteljes: összekötni, inspirálni és támogatni mindazokat, akik a körmös világban alkotnak vagy keresnek. Egy olyan platformot építünk, ahol a kreativitás, a szakmai fejlődés és a vendégélmény találkozik – mindezt valósághű inspirációkkal, átlátható információkkal és modern megoldásokkal.</p>
                             <p>Üdvözlettel, nails1.hu csapata!</p>
                         </div>
-                    
                     </div>
                 </div>
             </div>
@@ -629,6 +636,17 @@
     function closeAbout() {
         document.getElementById('aboutModal').classList.remove('active');
     }
+
+    function doSearch() {
+        const value = document.getElementById('searchInput').value.trim();
+        if (!value) return;
+        console.log('Keresés:', value);
+        // ide jön a keresési logika
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') doSearch();
+    });
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
