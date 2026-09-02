@@ -1,13 +1,12 @@
 (function () {
     'use strict';
 
-    let authMode = 'register'; // 'register' | 'login'
+    let authMode = 'register';
     let hasBeenShown = false;
     let dismissed = false;
-    const SCROLL_TRIGGER_PX = 800; // ennyi px scroll után jelenik meg
+    const SCROLL_TRIGGER_PX = 800;
     const STORAGE_KEY = 'nails1_auth_dismissed';
 
-    // Ha korábban már bezárta a session-ben
     if (sessionStorage.getItem(STORAGE_KEY) === '1') {
         dismissed = true;
     }
@@ -29,6 +28,15 @@
         sessionStorage.setItem(STORAGE_KEY, '1');
     }
 
+    function openAuthFromMenu() {
+        if (typeof window.closeMenu === 'function') {
+            window.closeMenu();
+        }
+        sessionStorage.removeItem(STORAGE_KEY);
+        dismissed = false;
+        openAuth();
+    }
+
     function toggleAuthMode() {
         authMode = (authMode === 'register') ? 'login' : 'register';
         applyAuthMode();
@@ -38,15 +46,19 @@
         const title = document.getElementById('authTitle');
         const subtitle = document.getElementById('authSubtitle');
         const nameGroup = document.getElementById('nameGroup');
+        const professionalGroup = document.getElementById('professionalGroup');
         const submitBtn = document.getElementById('authSubmitBtn');
         const switchText = document.getElementById('authSwitchText');
         const switchBtn = document.getElementById('authSwitchBtn');
         const passwordInput = document.getElementById('authPassword');
 
+        if (!title) return;
+
         if (authMode === 'register') {
             title.textContent = 'Csatlakozz hozzánk';
             subtitle.textContent = 'Regisztrálj, hogy elmenthesd kedvenc inspirációidat, és személyre szabott ajánlásokat kapj.';
             nameGroup.classList.remove('hidden');
+            professionalGroup.classList.remove('hidden');
             submitBtn.textContent = 'Regisztráció';
             switchText.textContent = 'Már van fiókod?';
             switchBtn.textContent = 'Belépés';
@@ -55,6 +67,7 @@
             title.textContent = 'Üdv újra!';
             subtitle.textContent = 'Lépj be, és folytasd ott, ahol abbahagytad.';
             nameGroup.classList.add('hidden');
+            professionalGroup.classList.add('hidden');
             submitBtn.textContent = 'Belépés';
             switchText.textContent = 'Még nincs fiókod?';
             switchBtn.textContent = 'Regisztráció';
@@ -69,18 +82,22 @@
         const name = document.getElementById('authName').value.trim();
 
         if (authMode === 'register') {
-            console.log('Regisztráció:', { name, email, password });
-            // ide jön a regisztrációs API hívás
+            const accountTypeInput = document.querySelector('input[name="accountType"]:checked');
+            if (!accountTypeInput) {
+                alert('Kérlek válaszd ki, hogy vendégként vagy szolgáltatóként regisztrálsz!');
+                return;
+            }
+            const accountType = accountTypeInput.value;
+            const isProfessional = accountType === 'professional';
+
+            console.log('Regisztráció:', { name, email, password, accountType, isProfessional });
         } else {
             console.log('Belépés:', { email, password });
-            // ide jön a login API hívás
         }
     }
 
     function socialAuth(provider) {
         console.log('Social auth:', provider);
-        // ide jön a Google / Facebook OAuth logika
-        // pl. window.location.href = '/auth/' + provider;
     }
 
     function onScroll() {
@@ -90,12 +107,12 @@
         }
     }
 
-    // Globális elérés a HTML onclick-ekhez
+    window.openAuth = openAuth;
     window.closeAuth = closeAuth;
+    window.openAuthFromMenu = openAuthFromMenu;
     window.toggleAuthMode = toggleAuthMode;
     window.handleAuthSubmit = handleAuthSubmit;
     window.socialAuth = socialAuth;
-    window.openAuth = openAuth; // opcionálisan manuálisan is nyitható
 
     window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('DOMContentLoaded', applyAuthMode);
